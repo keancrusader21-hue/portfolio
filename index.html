@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kean Ide — Video Editor</title><link rel="stylesheet" href="style.css">
+</head><body><div class="wrap">
+<nav><b>Kean Ide</b><div><a href="#work">Work</a><a href="#services">Services</a><a href="#contact">Contact</a></div></nav>
+<header class="hero"><span class="tag">Open for freelance projects</span>
+<h1>I edit videos that <span>keep people watching.</span></h1>
+<p>Video editor from the Philippines — movie recaps, MLBB highlights, and short-form content with tight pacing and clean cuts.</p>
+<a class="btn" href="#work">See my work</a> <a class="btn ghost" href="#contact">Hire me</a></header>
+
+<section id="work"><h2>Selected work</h2>
+<div class="filters" id="filters">
+<button class="on" data-f="all">All</button><button data-f="recap">Movie recaps</button>
+<button data-f="mlbb">MLBB highlights</button><button data-f="short">Short-form</button></div>
+<div class="grid" id="grid"><p class="muted">Loading…</p></div></section>
+
+<section id="services"><h2>What I do</h2><div class="svc">
+<div><h3>Long-form editing</h3><p>Movie recaps and story videos with clean pacing, subtitles, and sound design.</p></div>
+<div><h3>Gaming highlights</h3><p>MLBB montages with beat-synced cuts, transitions, and effects.</p></div>
+<div><h3>Short-form content</h3><p>Vertical videos with captions, hooks, and fast turnaround.</p></div></div></section>
+
+<section id="contact"><div class="contact"><h2>Let’s work together</h2>
+<p class="muted">Send me your raw footage and I’ll turn it into something worth posting.</p>
+<a class="btn" href="mailto:your@email.com">your@email.com</a></div></section>
+<footer>© 2026 Kean L. Ide</footer></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const grid = document.getElementById('grid');
+let items = [], filter = 'all';
+const label = {recap:'Movie recap', mlbb:'MLBB highlights', short:'Short-form'};
+
+function render(){
+  grid.innerHTML = '';
+  const list = items.filter(p => filter === 'all' || p.category === filter);
+  if(!list.length){ grid.innerHTML = '<p class="muted">Wala pang projects dito.</p>'; return; }
+  list.forEach(p => {
+    const a = document.createElement('a'); a.className = 'card';
+    a.href = p.video_url; a.target = '_blank'; a.rel = 'noopener';
+    const t = document.createElement('div'); t.className = 'thumb';
+    if(p.thumb_url){ const im = document.createElement('img'); im.src = p.thumb_url; im.alt = p.title; im.loading = 'lazy'; t.appendChild(im); }
+    else t.textContent = '▶';
+    const i = document.createElement('div'); i.className = 'i';
+    const h = document.createElement('h3'); h.textContent = p.title;
+    const s = document.createElement('small');
+    s.textContent = label[p.category] + (p.duration ? ' · ' + p.duration : '');
+    i.append(h, s); a.append(t, i); grid.appendChild(a);
+  });
+}
+
+document.querySelectorAll('#filters button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#filters button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on'); filter = b.dataset.f; render();
+});
+
+(async () => {
+  const { data, error } = await db.from('projects').select('*').order('created_at', { ascending: false });
+  if(error){ grid.innerHTML = '<p class="muted">Hindi ma-load ang projects. Check config.js.</p>'; return; }
+  items = data; render();
+})();
+</script></body></html>

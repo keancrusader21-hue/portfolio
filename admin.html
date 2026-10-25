@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Admin</title><link rel="stylesheet" href="style.css">
+</head><body><div class="wrap">
+<nav><b>Admin</b><div><a href="index.html">← Back to site</a></div></nav>
+<p id="msg"></p>
+
+<div class="box" id="loginBox"><h2>Login</h2>
+<label>Email</label><input id="email" type="email">
+<label>Password</label><input id="pass" type="password">
+<button class="btn" id="loginBtn">Login</button></div>
+
+<div id="panel" hidden>
+<div class="box"><h2 id="formTitle">Add project</h2>
+<label>Title</label><input id="title">
+<label>Category</label><select id="cat"><option value="recap">Movie recap</option><option value="mlbb">MLBB highlights</option><option value="short">Short-form</option></select>
+<label>Video link (YouTube / Facebook / TikTok)</label><input id="video">
+<label>Thumbnail image link (optional)</label><input id="thumb">
+<label>Duration (e.g. 10 min)</label><input id="dur">
+<button class="btn" id="saveBtn">Save</button>
+<button class="btn ghost" id="cancelBtn" hidden>Cancel edit</button></div>
+<div class="box"><h2>Projects</h2><div id="list"></div></div>
+<button class="btn ghost" id="logoutBtn">Logout</button>
+</div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const $ = id => document.getElementById(id);
+let items = [], editId = null;
+const say = t => $('msg').textContent = t || '';
+
+function showPanel(on){ $('panel').hidden = !on; $('loginBox').hidden = on; }
+
+async function loadList(){
+  const { data, error } = await db.from('projects').select('*').order('created_at', { ascending:false });
+  if(error) return say(error.message);
+  items = data; $('list').innerHTML = '';
+  if(!items.length) $('list').innerHTML = '<p class="muted">Wala pang projects.</p>';
+  items.forEach(p => {
+    const r = document.createElement('div'); r.className = 'row';
+    const n = document.createElement('span'); n.textContent = p.title;
+    const b = document.createElement('div');
+    const e = document.createElement('button'); e.textContent = 'Edit'; e.onclick = () => startEdit(p);
+    const d = document.createElement('button'); d.textContent = 'Delete'; d.onclick = () => del(p);
+    b.append(e, d); r.append(n, b); $('list').appendChild(r);
+  });
+}
+
+function resetForm(){
+  editId = null; ['title','video','thumb','dur'].forEach(i => $(i).value = '');
+  $('cat').value = 'recap'; $('formTitle').textContent = 'Add project'; $('cancelBtn').hidden = true;
+}
+function startEdit(p){
+  editId = p.id; $('title').value = p.title; $('cat').value = p.category; $('video').value = p.video_url;
+  $('thumb').value = p.thumb_url || ''; $('dur').value = p.duration || '';
+  $('formTitle').textContent = 'Edit project'; $('cancelBtn').hidden = false; scrollTo({top:0, behavior:'smooth'});
+}
+async function del(p){
+  if(!confirm('Delete "' + p.title + '"?')) return;
+  const { error } = await db.from('projects').delete().eq('id', p.id);
+  say(error ? error.message : ''); loadList();
+}
+
+$('saveBtn').onclick = async () => {
+  const row = { title:$('title').value.trim(), category:$('cat').value, video_url:$('video').value.trim(),
+    thumb_url:$('thumb').value.trim() || null, duration:$('dur').value.trim() || null };
+  if(!row.title || !row.video_url) return say('Title at video link ang required.');
+  const q = editId ? db.from('projects').update(row).eq('id', editId) : db.from('projects').insert(row);
+  const { error } = await q;
+  if(error) return say(error.message);
+  say('Saved!'); resetForm(); loadList();
+};
+$('cancelBtn').onclick = resetForm;
+
+$('loginBtn').onclick = async () => {
+  const { error } = await db.auth.signInWithPassword({ email:$('email').value, password:$('pass').value });
+  if(error) return say(error.message);
+  say(''); showPanel(true); loadList();
+};
+$('logoutBtn').onclick = async () => { await db.auth.signOut(); showPanel(false); };
+
+(async () => {
+  const { data } = await db.auth.getSession();
+  if(data.session){ showPanel(true); loadList(); }
+})();
+</script></body></html>
