@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kean Ide — Video Editor</title><link rel="stylesheet" href="style.css">
+<meta name="description" content="Kean Ide — freelance video editor and BSIT student from the Philippines."><title>Kean Ide — Video Editor</title><link rel="stylesheet" href="style.css">
 </head><body><div class="wrap">
 <nav><b>Kean Ide</b><div><a href="#about">About</a><a href="#work">Work</a><a href="#services">Services</a><a href="#contact">Contact</a></div></nav>
-<header class="hero"><span class="tag">Open for freelance projects</span>
+<header class="hero"><div class="hero-text"><span class="tag">Open for freelance projects</span> <span class="tag edu">🎓 BSIT · 3rd Year Student</span>
 <h1>I edit videos that <span>keep people watching.</span></h1>
-<p>Video editor from the Philippines — movie recaps, MLBB highlights, and short-form content with tight pacing and clean cuts.</p>
-<a class="btn" href="#work">See my work</a> <a class="btn ghost" href="#contact">Hire me</a></header>
+<p>Video editor from the Philippines — movie recaps, ROS Legacy gameplay, and short-form content with tight pacing and clean cuts.</p>
+<a class="btn" href="#work">See my work</a> <a class="btn ghost" href="#contact">Hire me</a></div><img class="photo" src="photo.png" alt="Photo of Kean Ide" width="280" height="280"></header>
 
 <section id="work"><h2>Selected work</h2>
 <div class="filters" id="filters">
 <button class="on" data-f="all">All</button><button data-f="recap">Movie recaps</button>
-<button data-f="mlbb">MLBB highlights</button><button data-f="short">Short-form</button></div>
+<button data-f="mlbb">ROS Legacy gameplay</button><button data-f="short">Short-form</button></div>
 <div class="grid" id="grid"><p class="muted">Loading…</p></div></section>
 
 <section id="about"><h2>About me</h2>
-<div class="box"><p>I'm Kean, a video editor from the Philippines. I edit movie recaps, MLBB highlights, and short-form videos for TikTok, YouTube, and Facebook Reels, and I can do English voiceover too.</p>
+<div class="box"><p>I'm Kean, a video editor from the Philippines. I edit movie recaps, ROS Legacy gameplay, and short-form videos for TikTok, YouTube, and Facebook Reels, and I can do English voiceover too.</p>
+<div class="edu-card"><b>🎓 Bachelor of Science in Information Technology</b><span>3rd Year Student</span></div>
 <div class="tools"><span>CapCut</span><span>English voiceover</span><span>Movie recaps</span><span>Short-form</span></div></div></section>
 
 <section id="services"><h2>What I do</h2><div class="svc">
 <div><h3>Long-form editing</h3><p>Movie recaps and story videos with clean pacing, subtitles, and sound design.</p></div>
-<div><h3>Gaming highlights</h3><p>MLBB montages with beat-synced cuts, transitions, and effects.</p></div>
+<div><h3>Gameplay editing</h3><p>ROS Legacy gameplay videos with clean cuts, captions, and effects.</p></div>
 <div><h3>Short-form content</h3><p>Vertical videos with captions, hooks, and fast turnaround.</p></div></div></section>
 
 <section id="contact"><div class="contact"><h2>Let’s work together</h2>
@@ -35,7 +36,7 @@
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const grid = document.getElementById('grid');
 let items = [], filter = 'all';
-const label = {recap:'Movie recap', mlbb:'MLBB highlights', short:'Short-form'};
+const label = {recap:'Movie recap', mlbb:'ROS Legacy gameplay', short:'Short-form'};
 
 function render(){
   grid.innerHTML = '';
